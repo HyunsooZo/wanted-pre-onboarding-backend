@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 public class CompanyDto {
     private Long id;
     private String email;
-    private String Name;
-    private String Address;
-    private String Phone;
+    private String name;
+    private String address;
+    private String phone;
 
     public static CompanyDto from(Company company) {
         return CompanyDto.builder()
                 .id(company.getId())
                 .email(company.getEmail())
-                .Name(company.getName())
-                .Address(company.getAddress())
-                .Phone(company.getPhone())
+                .name(company.getName())
+                .address(company.getAddress())
+                .phone(company.getPhone())
                 .build();
     }
 }

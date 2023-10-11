@@ -22,7 +22,7 @@ public class JobPostingDto {
     private Long id;
     private String companyEmail;
     private String position;
-    private int reward;
+    private Long reward;
     private String content;
     private List<String> techStacks;
 
@@ -48,7 +48,7 @@ public class JobPostingDto {
         private String position;
 
         @Min(value = 0, message = "보상은 0원 이상이어야 합니다.")
-        private int reward;
+        private Long reward;
 
         //해당 프로젝트에선 인증과정이 생략되므로 id(실제 사용자가 로그인시 사용하는 ID)를 입력받는다.
         @NotBlank(message = "Id는 필수입력 항목입니다.")
@@ -62,4 +62,17 @@ public class JobPostingDto {
         private List<String> techStacks;
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class PostingResponse {
+        private List<JobPostingDto> techStacks;
+
+        public static PostingResponse from(List<JobPostingDto> techStacks) {
+            return PostingResponse.builder()
+                    .techStacks(techStacks)
+                    .build();
+        }
+    }
 }

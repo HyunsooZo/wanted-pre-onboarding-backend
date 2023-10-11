@@ -31,4 +31,9 @@ public class JobPostingService {
         jobPostingRepository.save(JobPosting.from(jobPostingRequestDto, company));
     }
 
+    public List<JobPostingDto> getJobPostings() {
+        return jobPostingRepository.findAll().stream()
+                .map(JobPostingDto::from)
+                .collect(Collectors.toList());
+    }
 }

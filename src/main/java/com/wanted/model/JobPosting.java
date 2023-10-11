@@ -28,7 +28,7 @@ public class JobPosting extends BaseEntity {
 
     private String imageUrl;
     private String position;
-    private int reward;
+    private Long reward;
     private String content;
 
     @ElementCollection
