@@ -1,44 +1,55 @@
 package com.wanted.config;
 
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Collections;
+import org.springframework.validation.Errors;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-public class SwaggerConfig {
-
+@EnableSwagger2
+public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
-    public GroupedOpenApi publicApi() {
-        return GroupedOpenApi.builder()
-                .group("v1-plop")
-                .pathsToMatch("/chatting/**")
+    public Docket api() {
+
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.wanted"))
+                .paths(PathSelectors.any())
+                .build()
+                .apiInfo(apiInfo())
+                .ignoredParameterTypes(Errors.class);
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("Wanted 사전과제 REST API")
+                .description("Spring boot를 이용한 REST API 프로젝트")
+                .version("0.0.1")
+                .contact(new Contact("조현수",
+                        "https://github.com/HyunsooZo",
+                        "bzhs1992@icloud.com"))
                 .build();
     }
 
-    @Bean
-    public OpenAPI openAPI() {
-        String title = "Plop Chat-service API Docs";
-        String description = "Plop Messenger App REST API Document - Chat";
+    // swagger-ui 페이지 연결 핸들러 설정
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry
+                .addResourceHandler("/swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
 
-        SecurityScheme securityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
-                .in(SecurityScheme.In.HEADER).name("Authorization");
+        registry
+                .addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
 
-        SecurityRequirement schemaRequirement =
-                new SecurityRequirement().addList("bearerAuth");
-
-        return new OpenAPI()
-                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
-                .security(Collections.singletonList(schemaRequirement))
-                .info(new Info().title(title)
-                        .description(description)
-                        .version("v0.0.1"));
     }
 }
