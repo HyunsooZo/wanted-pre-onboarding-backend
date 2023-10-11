@@ -9,16 +9,16 @@ import com.wanted.repository.JobPostingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -31,12 +31,13 @@ public class JobPostingServiceTest {
     @Mock
     private JobPostingRepository jobPostingRepository;
 
-    @InjectMocks
     private JobPostingService jobPostingService;
 
     @BeforeEach
     public void setUp() {
+
         MockitoAnnotations.initMocks(this);
+        jobPostingService = new JobPostingService(jobPostingRepository, companyRepository);
     }
 
     @Test
@@ -49,8 +50,8 @@ public class JobPostingServiceTest {
                         .content("테스트입니다")
                         .imageUrl("테스트입니다")
                         .position("대리")
-                        .reward(50000)
-                        .techStacks(new ArrayList<>(Arrays.asList("Java", "Spring")))
+                        .reward(50000L)
+                        .techStacks(Arrays.asList("Java", "Spring"))
                         .build();
 
         Company company = new Company();
@@ -75,8 +76,8 @@ public class JobPostingServiceTest {
                         .content("테스트입니다")
                         .imageUrl("테스트입니다")
                         .position("대리")
-                        .reward(50000)
-                        .techStacks(new ArrayList<>(Arrays.asList("Java", "Spring")))
+                        .reward(50000L)
+                        .techStacks(Arrays.asList("Java", "Spring"))
                         .build();
 
         when(companyRepository.findByEmail("test@naver.com"))
@@ -87,4 +88,55 @@ public class JobPostingServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage("존재하지 않는 회사입니다.");
     }
+
+    @Test
+    @DisplayName("채용공고 리스트 조회 - 성공")
+    public void testGetJobPostings_success() {
+        // Given
+        Company company = Company.builder()
+                .id(1L)
+                .email("test@naver.com")
+                .phone("010-1234-1234")
+                .address("서울시 강남구")
+                .name("테스트")
+                .password("1234")
+                .businessNumber("123-45-67890")
+                .build();
+
+        JobPosting jobPosting1 = JobPosting.builder()
+                .id(1L)
+                .techStacks(Arrays.asList("Java", "Spring"))
+                .company(company)
+                .content("테스트입니다")
+                .imageUrl("테스트입니다")
+                .position("대리")
+                .reward(50000L)
+                .build();
+
+        JobPosting jobPosting2 = JobPosting.builder()
+                .id(2L)
+                .company(company)
+                .content("테스트입니다")
+                .imageUrl("테스트입니다")
+                .position("대리")
+                .reward(50000L)
+                .techStacks(Arrays.asList("Python", "C++"))
+                .build();
+
+        List<JobPosting> jobPostingList = Arrays.asList(jobPosting1, jobPosting2);
+
+        when(jobPostingRepository.findAll()).thenReturn(jobPostingList);
+
+        // When
+        List<JobPostingDto> result = jobPostingService.getJobPostings();
+
+        // Then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getTechStacks())
+                .isEqualTo(Arrays.asList("Java", "Spring"));
+        assertThat(result.get(1).getTechStacks())
+                .isEqualTo(Arrays.asList("Python", "C++"));
+    }
+
+
 }
