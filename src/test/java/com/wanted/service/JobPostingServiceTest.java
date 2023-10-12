@@ -218,7 +218,7 @@ public class JobPostingServiceTest {
                         .reward(1000L)
                         .position("")
                         .title(null)
-                        .techStacks(Arrays.asList("변경1", "변경2"))
+                        .techStacks(Arrays.asList("변경1" , "변경2"))
                         .build();
 
         when(jobPostingRepository.findById(targetJobPosting.getId()))
