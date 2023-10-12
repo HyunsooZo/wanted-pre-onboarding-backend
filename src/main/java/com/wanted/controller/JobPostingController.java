@@ -2,6 +2,7 @@ package com.wanted.controller;
 
 import com.wanted.dto.JobPostingModificationRequest;
 import com.wanted.dto.jobposting.*;
+import com.wanted.service.ImageService;
 import com.wanted.service.JobPostingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,6 +23,7 @@ import static org.springframework.http.HttpStatus.*;
 public class JobPostingController {
 
     private final JobPostingService jobPostingService;
+    private final ImageService imageService;
 
     @PostMapping
     @ApiOperation(value = "채용공고 등록", notes = "채용공고를 등록합니다.")
@@ -63,6 +65,19 @@ public class JobPostingController {
             @Valid @RequestBody JobPostingModificationRequest jobPostingModificationRequestDto) {
 
         jobPostingService.modifyJobPosting(id,jobPostingModificationRequestDto);
+
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "채용공고 삭제", notes = "채용공고를 삭제합니다.")
+    public ResponseEntity<Void> deleteJobPosting(
+            @PathVariable Long id) {
+
+        String targetImageUrl = jobPostingService.deleteJobPosting(id);
+
+        //채용공고 삭제 시 공고이미지도 삭제
+        imageService.deleteFile(targetImageUrl);
 
         return ResponseEntity.status(NO_CONTENT).build();
     }
