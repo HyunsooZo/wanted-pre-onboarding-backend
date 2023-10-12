@@ -1,7 +1,10 @@
 package com.wanted.service;
 
-import com.wanted.dto.JobPostingDto;
+import com.wanted.dto.jobposting.JobPostingDetailDto;
+import com.wanted.dto.jobposting.JobPostingDto;
+import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
 import com.wanted.exception.CustomException;
+import com.wanted.exception.ErrorCode;
 import com.wanted.model.Company;
 import com.wanted.model.JobPosting;
 import com.wanted.repository.CompanyRepository;
@@ -13,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +48,8 @@ public class JobPostingServiceTest {
     @DisplayName("채용공고 등록 - 성공")
     public void addJobPosting_Success() {
         // Given
-        JobPostingDto.PostingRequest requestDto =
-                JobPostingDto.PostingRequest.builder()
+        JobPostingRegistrationRequest requestDto =
+                JobPostingRegistrationRequest.builder()
                         .companyEmail("test@naver.com")
                         .content("테스트입니다")
                         .imageUrl("테스트입니다")
@@ -70,8 +74,8 @@ public class JobPostingServiceTest {
     @DisplayName("채용공고 등록 - 없는 기업")
     public void addJobPosting_Failure_CompanyNotFound() {
         // Given
-        JobPostingDto.PostingRequest requestDto =
-                JobPostingDto.PostingRequest.builder()
+        JobPostingRegistrationRequest requestDto =
+                JobPostingRegistrationRequest.builder()
                         .companyEmail("test@naver.com")
                         .content("테스트입니다")
                         .imageUrl("테스트입니다")
@@ -138,5 +142,94 @@ public class JobPostingServiceTest {
                 .isEqualTo(Arrays.asList("Python", "C++"));
     }
 
+    @Test
+    @DisplayName("채용공고 상세 정보 조회 - 성공")
+    public void testGetJobPostingDetails_success() {
+        // Given
+        Long companyId = 1L;
+
+        JobPosting targetJobPosting = JobPosting.builder()
+                .id(companyId)
+                .title("테스트 공고")
+                .company(Company.builder()
+                        .id(1L)
+                        .email("test@naver.com")
+                        .phone("010-1234-1234")
+                        .address("서울시 강남구")
+                        .name("테스트")
+                        .businessNumber("123-45-67890")
+                        .build())
+                .content("테스트입니다")
+                .imageUrl("테스트입니다")
+                .position("대리")
+                .reward(50000L)
+                .techStacks(Arrays.asList("Java", "Spring"))
+                .build();
+
+        List<JobPosting> jobPostings = new ArrayList<>();
+        JobPosting relatedJobPosting1 = JobPosting.builder()
+                .id(9L).title("테스트2").build();
+        jobPostings.add(relatedJobPosting1);
+
+        JobPosting relatedJobPosting2 = JobPosting.builder()
+                .id(8L).title("테스트3").build();
+        jobPostings.add(relatedJobPosting2);
+
+        when(jobPostingRepository.findById(companyId)).thenReturn(Optional.of(targetJobPosting));
+        when(jobPostingRepository.findByCompany(targetJobPosting.getCompany())).thenReturn(jobPostings);
+
+        // When
+        JobPostingDetailDto result = jobPostingService.getJobPostingDetails(companyId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getJobPosting()).isEqualTo(targetJobPosting);
+        assertThat(result.getRelations().size()).isEqualTo(2);
+        assertThat(result.getRelations().get(0).getTitle()).isEqualTo("테스트2");
+    }
+
+    @Test
+    @DisplayName("채용공고 상세 정보 조회 - 없는회사")
+    public void testGetJobPostingDetails_CompanyNotFound() {
+        // Given
+        Long companyId = 1L;
+
+        // 설정된 데이터와 다른 회사 ID
+        Long nonExistentCompanyId = 99L;
+
+        JobPosting targetJobPosting = JobPosting.builder()
+                .id(companyId)
+                .title("테스트 공고")
+                .company(Company.builder()
+                        .id(1L)
+                        .email("test@naver.com")
+                        .phone("010-1234-1234")
+                        .address("서울시 강남구")
+                        .name("테스트")
+                        .businessNumber("123-45-67890")
+                        .build())
+                .content("테스트입니다")
+                .imageUrl("테스트입니다")
+                .position("대리")
+                .reward(50000L)
+                .techStacks(Arrays.asList("Java", "Spring"))
+                .build();
+
+        List<JobPosting> jobPostings = new ArrayList<>();
+        JobPosting relatedJobPosting1 = JobPosting.builder()
+                .id(9L).title("테스트2").build();
+        jobPostings.add(relatedJobPosting1);
+
+        JobPosting relatedJobPosting2 = JobPosting.builder()
+                .id(8L).title("테스트3").build();
+        jobPostings.add(relatedJobPosting2);
+
+        when(jobPostingRepository.findById(nonExistentCompanyId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> jobPostingService.getJobPostingDetails(nonExistentCompanyId))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.JOB_POSTING_NOT_FOUND.getMessage());
+    }
 
 }

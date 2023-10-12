@@ -1,6 +1,6 @@
 package com.wanted.model;
 
-import com.wanted.dto.JobPostingDto;
+import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +26,7 @@ public class JobPosting extends BaseEntity {
     @JoinColumn(name = "company", referencedColumnName = "id")
     private Company company;
 
+    private String title;
     private String imageUrl;
     private String position;
     private Long reward;
@@ -40,7 +41,7 @@ public class JobPosting extends BaseEntity {
     private List<String> techStacks;
 
     public static JobPosting from(
-            JobPostingDto.PostingRequest jobPostingRequestDto,
+            JobPostingRegistrationRequest jobPostingRequestDto,
             Company company) {
         return JobPosting.builder()
                 .imageUrl(jobPostingRequestDto.getImageUrl())

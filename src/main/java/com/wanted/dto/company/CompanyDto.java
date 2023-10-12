@@ -1,4 +1,4 @@
-package com.wanted.dto;
+package com.wanted.dto.company;
 
 import com.wanted.model.Company;
 import io.swagger.annotations.Api;
