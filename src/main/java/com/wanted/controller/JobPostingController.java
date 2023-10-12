@@ -1,6 +1,6 @@
 package com.wanted.controller;
 
-import com.wanted.dto.JobPostingDto;
+import com.wanted.dto.jobposting.*;
 import com.wanted.service.JobPostingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +26,7 @@ public class JobPostingController {
     @PostMapping
     @ApiOperation(value = "채용공고 등록", notes = "채용공고를 등록합니다.")
     public ResponseEntity<Void> addJobPosting(
-            @Valid @RequestBody JobPostingDto.PostingRequest jobPostingRequestDto) {
+            @Valid @RequestBody JobPostingRegistrationRequest jobPostingRequestDto) {
 
         jobPostingService.addJobPosting(jobPostingRequestDto);
 
@@ -35,13 +35,25 @@ public class JobPostingController {
 
     @GetMapping
     @ApiOperation(value = "채용공고 조회", notes = "채용공고를 조회합니다.")
-    public ResponseEntity<JobPostingDto.PostingResponse> getJobPostings() {
+    public ResponseEntity<JobPostingListResponse> getJobPostings() {
 
         List<JobPostingDto> jobPostingResponseDto =
                 jobPostingService.getJobPostings();
 
         return ResponseEntity.status(OK)
-                .body(JobPostingDto.PostingResponse.from(jobPostingResponseDto));
+                .body(JobPostingListResponse.from(jobPostingResponseDto));
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation(value = "채용공고 상세 조회", notes = "채용공고 상세정보를 조회합니다.")
+    public ResponseEntity<JobPostingDetailResponse> getJobPostings(
+            @PathVariable Long id) {
+
+        JobPostingDetailDto jobPostingDetailDto =
+                jobPostingService.getJobPostingDetails(id);
+
+        return ResponseEntity.status(OK)
+                .body(JobPostingDetailResponse.from(jobPostingDetailDto));
     }
 
 }
