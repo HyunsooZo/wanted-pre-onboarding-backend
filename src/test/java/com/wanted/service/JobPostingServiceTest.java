@@ -171,13 +171,15 @@ public class JobPostingServiceTest {
 
         when(jobPostingRepository.findById(companyId)).thenReturn(Optional.of(targetJobPosting));
         when(jobPostingRepository.findByCompany(targetJobPosting.getCompany())).thenReturn(jobPostings);
+        when(companyRepository.findById(companyId)).thenReturn(Optional.of(company));
 
         // When
         JobPostingDetailDto result = jobPostingService.getJobPostingDetails(companyId);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getJobPosting()).isEqualTo(targetJobPosting);
+        assertThat(result.getJobPostingDto().getCompanyName())
+                .isEqualTo(targetJobPosting.getCompany().getName());
         assertThat(result.getRelations().size()).isEqualTo(2);
         assertThat(result.getRelations().get(0).getTitle()).isEqualTo("테스트2");
     }
