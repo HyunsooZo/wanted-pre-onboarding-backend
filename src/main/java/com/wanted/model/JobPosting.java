@@ -44,6 +44,7 @@ public class JobPosting extends BaseEntity {
             JobPostingRegistrationRequest jobPostingRequestDto,
             Company company) {
         return JobPosting.builder()
+                .title(jobPostingRequestDto.getTitle())
                 .imageUrl(jobPostingRequestDto.getImageUrl())
                 .position(jobPostingRequestDto.getPosition())
                 .reward(jobPostingRequestDto.getReward())

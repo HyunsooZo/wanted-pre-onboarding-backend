@@ -16,6 +16,7 @@ import java.util.List;
 @Api("채용공고 상세정보 Response")
 public class JobPostingDetailResponse {
     private Long id;
+    private String title;
     private CompanyDto company;
     private String position;
     private String imageUrl;
@@ -27,6 +28,7 @@ public class JobPostingDetailResponse {
     public static JobPostingDetailResponse from(JobPostingDetailDto jobPostingDetailDto) {
         return JobPostingDetailResponse.builder()
                 .id(jobPostingDetailDto.getJobPostingDto().getId())
+                .title(jobPostingDetailDto.getJobPostingDto().getTitle())
                 .company(jobPostingDetailDto.getCompany())
                 .position(jobPostingDetailDto.getJobPostingDto().getPosition())
                 .imageUrl(jobPostingDetailDto.getJobPostingDto().getImageUrl())
