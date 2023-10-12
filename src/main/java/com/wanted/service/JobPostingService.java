@@ -102,38 +102,4 @@ public class JobPostingService {
         return imageUrl;
     }
 
-    public void modifyJobPosting(Long id,
-                                 JobPostingModificationRequest ModificationRequestDto) {
-
-        JobPosting jobPosting = jobPostingRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.JOB_POSTING_NOT_FOUND));
-
-        // 빈값이거나 null 이 아닌 경우에만 수정
-        updateIfNotNull(jobPosting::setContent, ModificationRequestDto.getContent());
-        updateIfNotNull(jobPosting::setImageUrl, ModificationRequestDto.getImageUrl());
-        updateIfNotNull(jobPosting::setReward, ModificationRequestDto.getReward());
-        updateIfNotNull(jobPosting::setPosition, ModificationRequestDto.getPosition());
-        updateIfNotNull(jobPosting::setTechStacks, ModificationRequestDto.getTechStacks());
-
-        jobPostingRepository.save(jobPosting);
-    }
-
-    private <T> void updateIfNotNull(Consumer<T> setter, T value) {
-        if (value != null && (!(value instanceof String) || !((String) value).isEmpty())) {
-            setter.accept(value);
-        }
-    }
-
-    public String deleteJobPosting(Long id) {
-
-        JobPosting jobPosting = jobPostingRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.JOB_POSTING_NOT_FOUND));
-
-        String imageUrl = jobPosting.getImageUrl();
-
-        jobPostingRepository.delete(jobPosting);
-
-        return imageUrl;
-    }
-
 }
