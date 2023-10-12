@@ -14,7 +14,7 @@ public class JobPostingDto {
     private Long id;
     private String imageUrl;
     private String title;
-    private String companyEmail;
+    private String companyName;
     private String position;
     private Long reward;
     private List<String> techStacks;
@@ -24,7 +24,7 @@ public class JobPostingDto {
                 .id(jobPosting.getId())
                 .imageUrl(jobPosting.getImageUrl())
                 .title(jobPosting.getTitle())
-                .companyEmail(jobPosting.getCompany().getEmail())
+                .companyName(jobPosting.getCompany().getName())
                 .position(jobPosting.getPosition())
                 .reward(jobPosting.getReward())
                 .techStacks(jobPosting.getTechStacks())

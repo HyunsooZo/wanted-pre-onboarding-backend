@@ -1,6 +1,7 @@
 package com.wanted.service;
 
 import com.wanted.dto.JobPostingModificationRequest;
+import com.wanted.dto.company.CompanyDto;
 import com.wanted.dto.jobposting.JobPostingDetailDto;
 import com.wanted.dto.jobposting.JobPostingDto;
 import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
@@ -56,7 +57,49 @@ public class JobPostingService {
                         .map(JobPostingRelationsDto::from)
                         .collect(Collectors.toList());
 
-        return JobPostingDetailDto.from(targetJobPosting, relations);
+        Company company = companyRepository.findById(targetJobPosting.getCompany().getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.COMPANY_NOT_FOUND));
+
+        return JobPostingDetailDto.from(
+                JobPostingDto.from(targetJobPosting),
+                CompanyDto.from(company),
+                targetJobPosting.getContent(),
+                relations
+        );
+    }
+
+    public void modifyJobPosting(Long id,
+                                 JobPostingModificationRequest ModificationRequestDto) {
+
+        JobPosting jobPosting = jobPostingRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOB_POSTING_NOT_FOUND));
+
+        // 빈값이거나 null 이 아닌 경우에만 수정
+        updateIfNotNull(jobPosting::setContent, ModificationRequestDto.getContent());
+        updateIfNotNull(jobPosting::setImageUrl, ModificationRequestDto.getImageUrl());
+        updateIfNotNull(jobPosting::setReward, ModificationRequestDto.getReward());
+        updateIfNotNull(jobPosting::setPosition, ModificationRequestDto.getPosition());
+        updateIfNotNull(jobPosting::setTechStacks, ModificationRequestDto.getTechStacks());
+
+        jobPostingRepository.save(jobPosting);
+    }
+
+    private <T> void updateIfNotNull(Consumer<T> setter, T value) {
+        if (value != null && (!(value instanceof String) || !((String) value).isEmpty())) {
+            setter.accept(value);
+        }
+    }
+
+    public String deleteJobPosting(Long id) {
+
+        JobPosting jobPosting = jobPostingRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOB_POSTING_NOT_FOUND));
+
+        String imageUrl = jobPosting.getImageUrl();
+
+        jobPostingRepository.delete(jobPosting);
+
+        return imageUrl;
     }
 
     public void modifyJobPosting(Long id,

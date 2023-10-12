@@ -33,4 +33,6 @@ public class Company extends BaseEntity {
 
     private String businessNumber;
 
+    private String imageUrl;
+
 }
