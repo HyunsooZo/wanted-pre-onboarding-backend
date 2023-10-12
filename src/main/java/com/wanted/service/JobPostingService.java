@@ -81,4 +81,16 @@ public class JobPostingService {
         }
     }
 
+    public String deleteJobPosting(Long id) {
+
+        JobPosting jobPosting = jobPostingRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOB_POSTING_NOT_FOUND));
+
+        String imageUrl = jobPosting.getImageUrl();
+
+        jobPostingRepository.delete(jobPosting);
+
+        return imageUrl;
+    }
+
 }
