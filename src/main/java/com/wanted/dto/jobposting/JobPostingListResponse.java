@@ -14,11 +14,11 @@ import java.util.List;
 @Builder
 @Api("채용공고 전체목록 Response")
 public class JobPostingListResponse {
-    private List<JobPostingDto> techStacks;
+    private List<JobPostingDto> jobPostings;
 
     public static JobPostingListResponse from(List<JobPostingDto> techStacks) {
         return JobPostingListResponse.builder()
-                .techStacks(techStacks)
+                .jobPostings(techStacks)
                 .build();
     }
 }

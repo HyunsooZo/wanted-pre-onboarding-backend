@@ -1,5 +1,6 @@
 package com.wanted.dto.jobposting;
 
+import com.wanted.dto.company.CompanyDto;
 import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.util.List;
 @Api("채용공고 상세정보 Response")
 public class JobPostingDetailResponse {
     private Long id;
-    private String companyEmail;
+    private CompanyDto company;
     private String position;
     private String imageUrl;
     private Long reward;
@@ -25,13 +26,13 @@ public class JobPostingDetailResponse {
 
     public static JobPostingDetailResponse from(JobPostingDetailDto jobPostingDetailDto) {
         return JobPostingDetailResponse.builder()
-                .id(jobPostingDetailDto.getJobPosting().getId())
-                .companyEmail(jobPostingDetailDto.getJobPosting().getCompany().getEmail())
-                .position(jobPostingDetailDto.getJobPosting().getPosition())
-                .imageUrl(jobPostingDetailDto.getJobPosting().getImageUrl())
-                .reward(jobPostingDetailDto.getJobPosting().getReward())
-                .content(jobPostingDetailDto.getJobPosting().getContent())
-                .techStacks(jobPostingDetailDto.getJobPosting().getTechStacks())
+                .id(jobPostingDetailDto.getJobPostingDto().getId())
+                .company(jobPostingDetailDto.getCompany())
+                .position(jobPostingDetailDto.getJobPostingDto().getPosition())
+                .imageUrl(jobPostingDetailDto.getJobPostingDto().getImageUrl())
+                .reward(jobPostingDetailDto.getJobPostingDto().getReward())
+                .content(jobPostingDetailDto.getContent())
+                .techStacks(jobPostingDetailDto.getJobPostingDto().getTechStacks())
                 .relations(jobPostingDetailDto.getRelations())
                 .build();
     }

@@ -1,6 +1,7 @@
 package com.wanted.service;
 
 import com.wanted.dto.JobPostingModificationRequest;
+import com.wanted.dto.company.CompanyDto;
 import com.wanted.dto.jobposting.JobPostingDetailDto;
 import com.wanted.dto.jobposting.JobPostingDto;
 import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
@@ -56,7 +57,15 @@ public class JobPostingService {
                         .map(JobPostingRelationsDto::from)
                         .collect(Collectors.toList());
 
-        return JobPostingDetailDto.from(targetJobPosting, relations);
+        Company company = companyRepository.findById(targetJobPosting.getCompany().getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.COMPANY_NOT_FOUND));
+
+        return JobPostingDetailDto.from(
+                JobPostingDto.from(targetJobPosting),
+                CompanyDto.from(company),
+                targetJobPosting.getContent(),
+                relations
+        );
     }
 
     public void modifyJobPosting(Long id,
