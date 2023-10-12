@@ -1,5 +1,6 @@
 package com.wanted.service;
 
+import com.wanted.dto.JobPostingModificationRequest;
 import com.wanted.dto.jobposting.JobPostingDetailDto;
 import com.wanted.dto.jobposting.JobPostingDto;
 import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
@@ -230,6 +231,55 @@ public class JobPostingServiceTest {
         assertThatThrownBy(() -> jobPostingService.getJobPostingDetails(nonExistentCompanyId))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.JOB_POSTING_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("채용공고 정보 수정 - 성공")
+    void testModifyJobPosting_success() {
+        // Give
+        JobPosting targetJobPosting = JobPosting.builder()
+                .id(1L)
+                .title("테스트 공고")
+                .company(Company.builder()
+                        .id(1L)
+                        .email("test@naver.com")
+                        .phone("010-1234-1234")
+                        .address("서울시 강남구")
+                        .name("테스트")
+                        .businessNumber("123-45-67890")
+                        .build())
+                .content("테스트입니다")
+                .imageUrl("테스트입니다")
+                .position("대리")
+                .reward(50000L)
+                .techStacks(Arrays.asList("Java", "Spring"))
+                .build();
+
+        JobPostingModificationRequest modificationRequestDto =
+                JobPostingModificationRequest.builder()
+                        .content("변경입니다")
+                        .imageUrl("변경입니다")
+                        .reward(1000L)
+                        .position("")
+                        .title(null)
+                        .techStacks(Arrays.asList("변경1" , "변경2"))
+                        .build();
+
+        when(jobPostingRepository.findById(targetJobPosting.getId()))
+                .thenReturn(Optional.of(targetJobPosting));
+
+        // When
+        jobPostingService.modifyJobPosting(
+                targetJobPosting.getId(), modificationRequestDto
+        );
+
+        // Then
+        assertThat(targetJobPosting.getContent()).isEqualTo("변경입니다");
+        assertThat(targetJobPosting.getImageUrl()).isEqualTo("변경입니다");
+        assertThat(targetJobPosting.getReward()).isEqualTo(1000);
+        assertThat(targetJobPosting.getPosition()).isEqualTo("대리");
+        assertThat(targetJobPosting.getTechStacks()).isEqualTo(Arrays.asList("변경1", "변경2"));
+        verify(jobPostingRepository, times(1)).save(targetJobPosting);
     }
 
 }
