@@ -45,6 +45,27 @@ public class JobPostingServiceTest {
         jobPostingService = new JobPostingService(jobPostingRepository, companyRepository);
     }
 
+    static Company company = Company.builder()
+            .id(1L)
+            .email("test@naver.com")
+            .phone("010-1234-1234")
+            .address("서울시 강남구")
+            .name("테스트")
+            .password("1234")
+            .businessNumber("123-45-67890")
+            .build();
+
+    static JobPosting targetJobPosting = JobPosting.builder()
+            .id(1L)
+            .title("테스트 공고")
+            .company(company)
+            .content("테스트입니다")
+            .imageUrl("테스트입니다")
+            .position("대리")
+            .reward(50000L)
+            .techStacks(Arrays.asList("Java", "Spring"))
+            .build();
+
     @Test
     @DisplayName("채용공고 등록 - 성공")
     public void addJobPosting_Success() {
@@ -98,16 +119,6 @@ public class JobPostingServiceTest {
     @DisplayName("채용공고 리스트 조회 - 성공")
     public void testGetJobPostings_success() {
         // Given
-        Company company = Company.builder()
-                .id(1L)
-                .email("test@naver.com")
-                .phone("010-1234-1234")
-                .address("서울시 강남구")
-                .name("테스트")
-                .password("1234")
-                .businessNumber("123-45-67890")
-                .build();
-
         JobPosting jobPosting1 = JobPosting.builder()
                 .id(1L)
                 .techStacks(Arrays.asList("Java", "Spring"))
@@ -149,24 +160,6 @@ public class JobPostingServiceTest {
         // Given
         Long companyId = 1L;
 
-        JobPosting targetJobPosting = JobPosting.builder()
-                .id(companyId)
-                .title("테스트 공고")
-                .company(Company.builder()
-                        .id(1L)
-                        .email("test@naver.com")
-                        .phone("010-1234-1234")
-                        .address("서울시 강남구")
-                        .name("테스트")
-                        .businessNumber("123-45-67890")
-                        .build())
-                .content("테스트입니다")
-                .imageUrl("테스트입니다")
-                .position("대리")
-                .reward(50000L)
-                .techStacks(Arrays.asList("Java", "Spring"))
-                .build();
-
         List<JobPosting> jobPostings = new ArrayList<>();
         JobPosting relatedJobPosting1 = JobPosting.builder()
                 .id(9L).title("테스트2").build();
@@ -193,28 +186,7 @@ public class JobPostingServiceTest {
     @DisplayName("채용공고 상세 정보 조회 - 없는회사")
     public void testGetJobPostingDetails_CompanyNotFound() {
         // Given
-        Long companyId = 1L;
-
-        // 설정된 데이터와 다른 회사 ID
         Long nonExistentCompanyId = 99L;
-
-        JobPosting targetJobPosting = JobPosting.builder()
-                .id(companyId)
-                .title("테스트 공고")
-                .company(Company.builder()
-                        .id(1L)
-                        .email("test@naver.com")
-                        .phone("010-1234-1234")
-                        .address("서울시 강남구")
-                        .name("테스트")
-                        .businessNumber("123-45-67890")
-                        .build())
-                .content("테스트입니다")
-                .imageUrl("테스트입니다")
-                .position("대리")
-                .reward(50000L)
-                .techStacks(Arrays.asList("Java", "Spring"))
-                .build();
 
         List<JobPosting> jobPostings = new ArrayList<>();
         JobPosting relatedJobPosting1 = JobPosting.builder()
@@ -228,7 +200,7 @@ public class JobPostingServiceTest {
         when(jobPostingRepository.findById(nonExistentCompanyId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> jobPostingService.getJobPostingDetails(nonExistentCompanyId))
+        assertThatThrownBy(()-> jobPostingService.getJobPostingDetails(nonExistentCompanyId))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.JOB_POSTING_NOT_FOUND.getMessage());
     }
@@ -236,25 +208,7 @@ public class JobPostingServiceTest {
     @Test
     @DisplayName("채용공고 정보 수정 - 성공")
     void testModifyJobPosting_success() {
-        // Give
-        JobPosting targetJobPosting = JobPosting.builder()
-                .id(1L)
-                .title("테스트 공고")
-                .company(Company.builder()
-                        .id(1L)
-                        .email("test@naver.com")
-                        .phone("010-1234-1234")
-                        .address("서울시 강남구")
-                        .name("테스트")
-                        .businessNumber("123-45-67890")
-                        .build())
-                .content("테스트입니다")
-                .imageUrl("테스트입니다")
-                .position("대리")
-                .reward(50000L)
-                .techStacks(Arrays.asList("Java", "Spring"))
-                .build();
-
+        // Given
         JobPostingModificationRequest modificationRequestDto =
                 JobPostingModificationRequest.builder()
                         .content("변경입니다")
@@ -262,7 +216,7 @@ public class JobPostingServiceTest {
                         .reward(1000L)
                         .position("")
                         .title(null)
-                        .techStacks(Arrays.asList("변경1" , "변경2"))
+                        .techStacks(Arrays.asList("변경1", "변경2"))
                         .build();
 
         when(jobPostingRepository.findById(targetJobPosting.getId()))
@@ -282,4 +236,19 @@ public class JobPostingServiceTest {
         verify(jobPostingRepository, times(1)).save(targetJobPosting);
     }
 
+    @Test
+    @DisplayName("채용공고 삭제 - 성공")
+    public void testDeleteJobPosting() {
+        // Given
+        when(jobPostingRepository.findById(targetJobPosting.getId()))
+                .thenReturn(Optional.of(targetJobPosting));
+
+        // When
+        String deletedImageUrl =
+                jobPostingService.deleteJobPosting(targetJobPosting.getId());
+
+        // Then
+        verify(jobPostingRepository).delete(targetJobPosting);
+        assertThat(deletedImageUrl).isEqualTo(targetJobPosting.getImageUrl());
+    }
 }
