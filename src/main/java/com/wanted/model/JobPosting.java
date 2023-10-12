@@ -52,4 +52,25 @@ public class JobPosting extends BaseEntity {
                 .company(company)
                 .build();
     }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public void setReward(Long reward) {
+        this.reward = reward;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setTechStacks(List<String> techStacks) {
+        this.techStacks = techStacks;
+    }
+
 }

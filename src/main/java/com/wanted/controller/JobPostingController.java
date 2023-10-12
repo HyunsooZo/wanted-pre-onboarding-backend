@@ -1,5 +1,6 @@
 package com.wanted.controller;
 
+import com.wanted.dto.JobPostingModificationRequest;
 import com.wanted.dto.jobposting.*;
 import com.wanted.service.JobPostingService;
 import io.swagger.annotations.Api;
@@ -12,8 +13,7 @@ import javax.validation.Valid;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/job-postings")
@@ -54,6 +54,17 @@ public class JobPostingController {
 
         return ResponseEntity.status(OK)
                 .body(JobPostingDetailResponse.from(jobPostingDetailDto));
+    }
+
+    @PatchMapping("/{id}")
+    @ApiOperation(value = "채용공고 수정", notes = "채용공고 내용을 수정합니다. (수정안하는 필드는 null로 보내주세요.)")
+    public ResponseEntity<Void> modifyJobPosting(
+            @PathVariable Long id,
+            @Valid @RequestBody JobPostingModificationRequest jobPostingModificationRequestDto) {
+
+        jobPostingService.modifyJobPosting(id,jobPostingModificationRequestDto);
+
+        return ResponseEntity.status(NO_CONTENT).build();
     }
 
 }

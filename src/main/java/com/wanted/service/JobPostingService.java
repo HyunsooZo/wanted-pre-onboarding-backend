@@ -1,6 +1,10 @@
 package com.wanted.service;
 
-import com.wanted.dto.jobposting.*;
+import com.wanted.dto.JobPostingModificationRequest;
+import com.wanted.dto.jobposting.JobPostingDetailDto;
+import com.wanted.dto.jobposting.JobPostingDto;
+import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
+import com.wanted.dto.jobposting.JobPostingRelationsDto;
 import com.wanted.exception.CustomException;
 import com.wanted.exception.ErrorCode;
 import com.wanted.model.Company;
@@ -13,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -52,6 +57,28 @@ public class JobPostingService {
                         .collect(Collectors.toList());
 
         return JobPostingDetailDto.from(targetJobPosting, relations);
+    }
+
+    public void modifyJobPosting(Long id,
+                                 JobPostingModificationRequest ModificationRequestDto) {
+
+        JobPosting jobPosting = jobPostingRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOB_POSTING_NOT_FOUND));
+
+        // 빈값이거나 null 이 아닌 경우에만 수정
+        updateIfNotNull(jobPosting::setContent, ModificationRequestDto.getContent());
+        updateIfNotNull(jobPosting::setImageUrl, ModificationRequestDto.getImageUrl());
+        updateIfNotNull(jobPosting::setReward, ModificationRequestDto.getReward());
+        updateIfNotNull(jobPosting::setPosition, ModificationRequestDto.getPosition());
+        updateIfNotNull(jobPosting::setTechStacks, ModificationRequestDto.getTechStacks());
+
+        jobPostingRepository.save(jobPosting);
+    }
+
+    private <T> void updateIfNotNull(Consumer<T> setter, T value) {
+        if (value != null && (!(value instanceof String) || !((String) value).isEmpty())) {
+            setter.accept(value);
+        }
     }
 
 }
