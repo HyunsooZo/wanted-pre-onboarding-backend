@@ -18,6 +18,7 @@ public class CompanyDto {
     private String name;
     private String address;
     private String phone;
+    private String imageUrl;
 
     public static CompanyDto from(Company company) {
         return CompanyDto.builder()
@@ -26,6 +27,7 @@ public class CompanyDto {
                 .name(company.getName())
                 .address(company.getAddress())
                 .phone(company.getPhone())
+                .imageUrl(company.getImageUrl())
                 .build();
     }
 }
