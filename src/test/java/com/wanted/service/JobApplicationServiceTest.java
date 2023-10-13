@@ -1,6 +1,6 @@
 package com.wanted.service;
 
-import com.wanted.dto.ApplicationDto;
+import com.wanted.dto.application.ApplicationDto;
 import com.wanted.enums.MemberRole;
 import com.wanted.exception.CustomException;
 import com.wanted.model.JobApplication;
