@@ -54,6 +54,32 @@ public class JobApplicationService {
 
     }
 
+    @Transactional(readOnly = true)
+    public List<JobApplicationDto> getApplications(Long memberId) {
+        Member member = getJobSeekerById(memberId);
+
+        List<JobApplication> jobApplications =
+                jobApplicationRepository.findAllByApplicant(member);
+
+        return jobApplications.stream()
+                .map(JobApplicationDto::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<JobApplicationDto> getApplicationsIGot(Long companyId) {
+        Member company = memberRepository.findById(companyId)
+                .orElseThrow(() -> new CustomException(COMPANY_NOT_FOUND));
+
+        List<JobPosting> jobPostings = jobPostingRepository.findByMember(company);
+
+        return jobPostings.stream()
+                .map(jobApplicationRepository::findAllByJobPosting)
+                .flatMap(List::stream)
+                .map(JobApplicationDto::from)
+                .collect(Collectors.toList());
+    }
+
     private JobApplication findJobApplicationByIdAndCheckOwnership(Member member,
                                                                    Long applicationId) {
         JobApplication jobApplication =
@@ -85,30 +111,5 @@ public class JobApplicationService {
         if (jobApplicationRepository.findByApplicantAndJobPosting(member, jobPosting).isPresent()) {
             throw new CustomException(ALREADY_APPLIED);
         }
-    }
-
-    public List<JobApplicationDto> getApplications(Long memberId) {
-        Member member = getJobSeekerById(memberId);
-
-        List<JobApplication> jobApplications =
-                jobApplicationRepository.findAllByApplicant(member);
-
-        return jobApplications.stream()
-                .map(JobApplicationDto::from)
-                .collect(Collectors.toList());
-    }
-
-    public List<JobApplicationDto> getApplicationsIGot(Long companyId) {
-        Member company = memberRepository.findById(companyId)
-                .orElseThrow(() -> new CustomException(COMPANY_NOT_FOUND));
-
-        List<JobPosting> jobPostings = jobPostingRepository.findByMember(company);
-
-        return jobPostings.stream()
-                .map(jobApplicationRepository::findByJobPosting)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(JobApplicationDto::from)
-                .collect(Collectors.toList());
     }
 }
