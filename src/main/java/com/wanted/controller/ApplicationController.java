@@ -7,12 +7,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/applications")
@@ -50,6 +48,17 @@ public class ApplicationController {
                 ));
 
         return ResponseEntity.status(CREATED).build();
+    }
+
+    @DeleteMapping("/{applicationId}/member/{memberId}")
+    @ApiOperation(value = "지원서 삭제", notes = "지원서를 삭제합니다.")
+    public ResponseEntity<Void> deleteApplication(
+            @PathVariable Long applicationId,
+            @PathVariable Long memberId) {
+
+        jobApplicationService.deleteApplication(memberId, applicationId);
+
+        return ResponseEntity.status(NO_CONTENT).build();
     }
 
 }

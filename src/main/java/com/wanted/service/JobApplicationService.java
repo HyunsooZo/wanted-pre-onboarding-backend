@@ -39,6 +39,30 @@ public class JobApplicationService {
         return ApplicationDto.from(jobSeekerDto, jobPostingDto);
     }
 
+    @Transactional
+    public void deleteApplication(Long memberId, Long applicationId) {
+        Member member = getJobSeekerById(memberId);
+
+        JobApplication jobApplication =
+                findJobApplicationByIdAndCheckOwnership(member, applicationId);
+
+        jobApplicationRepository.delete(jobApplication);
+
+    }
+
+    private JobApplication findJobApplicationByIdAndCheckOwnership(Member member,
+                                                                   Long applicationId) {
+        JobApplication jobApplication =
+                jobApplicationRepository.findById(applicationId)
+                        .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
+
+        if (!jobApplication.getApplicant().equals(member)) {
+            throw new CustomException(NOT_MY_APPLICATION);
+        }
+
+        return jobApplication;
+    }
+
     private Member getJobSeekerById(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(JOB_SEEKER_NOT_FOUND));
