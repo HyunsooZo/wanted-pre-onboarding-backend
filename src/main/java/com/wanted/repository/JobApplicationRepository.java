@@ -6,10 +6,14 @@ import com.wanted.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
     Optional<JobApplication> findByApplicantAndJobPosting(Member member,
                                                           JobPosting jobPosting);
+    Optional<JobApplication> findByJobPosting(JobPosting jobPosting);
+
+    List<JobApplication> findAllByApplicant(Member member);
 }

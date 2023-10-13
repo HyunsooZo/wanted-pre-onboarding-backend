@@ -1,7 +1,7 @@
 package com.wanted.controller;
 
 import com.wanted.component.EmailSender;
-import com.wanted.dto.application.ApplicationDto;
+import com.wanted.dto.application.JobApplicationDto;
 import com.wanted.service.JobApplicationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +16,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RequestMapping("/api/applications")
 @Api(tags = "(채용공고에)지원 API", description = "채용공고에 지원합니다.")
 @RestController
-public class ApplicationController {
+public class JobApplicationController {
     private final JobApplicationService jobApplicationService;
     private final EmailSender emailSender;
     final String SUBJECT = "%s 님으로 부터 채용공고 지원서가 도착했습니다.";
@@ -33,18 +33,18 @@ public class ApplicationController {
             @PathVariable Long memberId,
             @PathVariable Long jobPostingId) {
 
-        ApplicationDto applicationDto =
+        JobApplicationDto jobApplicationDto =
                 jobApplicationService.addApplication(memberId, jobPostingId);
 
         emailSender.sendEmail(
-                applicationDto.getJobPostingDto().getEmail(),
-                String.format(SUBJECT, applicationDto.getJobSeekerDto().getName()),
+                jobApplicationDto.getJobPostingDto().getEmail(),
+                String.format(SUBJECT, jobApplicationDto.getJobSeekerDto().getName()),
                 String.format(TEXT,
-                        applicationDto.getJobPostingDto().getTitle(),
-                        applicationDto.getJobSeekerDto().getEmail(),
-                        applicationDto.getJobSeekerDto().getName(),
-                        applicationDto.getJobSeekerDto().getPhone(),
-                        applicationDto.getJobSeekerDto().getImageUrl()
+                        jobApplicationDto.getJobPostingDto().getTitle(),
+                        jobApplicationDto.getJobSeekerDto().getEmail(),
+                        jobApplicationDto.getJobSeekerDto().getName(),
+                        jobApplicationDto.getJobSeekerDto().getPhone(),
+                        jobApplicationDto.getJobSeekerDto().getImageUrl()
                 ));
 
         return ResponseEntity.status(CREATED).build();

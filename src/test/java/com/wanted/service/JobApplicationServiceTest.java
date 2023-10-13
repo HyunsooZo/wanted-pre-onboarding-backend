@@ -1,6 +1,6 @@
 package com.wanted.service;
 
-import com.wanted.dto.application.ApplicationDto;
+import com.wanted.dto.application.JobApplicationDto;
 import com.wanted.enums.MemberRole;
 import com.wanted.exception.CustomException;
 import com.wanted.model.JobApplication;
@@ -17,12 +17,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static com.wanted.enums.MemberRole.JOB_SEEKER;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @DisplayName("구직 관련 테스트코드")
@@ -91,11 +93,11 @@ class JobApplicationServiceTest {
                 .thenReturn(Optional.empty());
 
         // When
-        ApplicationDto applicationDto = jobApplicationService.addApplication(
+        JobApplicationDto jobApplicationDto = jobApplicationService.addApplication(
                 member.getId(), jobPosting.getId());
 
         // Then
-        assertThat(applicationDto).isNotNull();
+        assertThat(jobApplicationDto).isNotNull();
     }
 
     @Test
@@ -144,5 +146,65 @@ class JobApplicationServiceTest {
         assertThatThrownBy(() -> jobApplicationService.addApplication(memberId, jobPostingId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("이미 지원한 공고입니다.");
+    }
+
+    @Test
+    public void testGetApplications() {
+        // Given
+
+        JobApplication application1 =
+                JobApplication.builder()
+                        .id(1L)
+                        .applicant(member)
+                        .jobPosting(jobPosting)
+                        .build();
+
+        JobApplication application2 =
+                JobApplication.builder()
+                        .id(2L)
+                        .applicant(member)
+                        .jobPosting(jobPosting)
+                        .build();
+
+        List<JobApplication> jobApplications = Arrays.asList(application1, application2);
+
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+        when(applicationRepository.findAllByApplicant(member)).thenReturn(jobApplications);
+
+        // When
+        List<JobApplicationDto> result =
+                jobApplicationService.getApplications(member.getId());
+
+        // Then
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testGetApplicationsIGot() {
+        // Given
+        JobApplication jobApplication =
+                JobApplication.builder()
+                        .id(1L)
+                        .applicant(member)
+                        .jobPosting(jobPosting)
+                        .build();
+
+        when(memberRepository.findById(company.getId())).thenReturn(Optional.of(company));
+        when(jobPostingRepository.findByMember(company))
+                .thenReturn(Collections.singletonList(jobPosting));
+
+        when(applicationRepository.findByJobPosting(jobPosting))
+                .thenReturn(Optional.of(jobApplication));
+
+        // When
+        List<JobApplicationDto> result =
+                jobApplicationService.getApplicationsIGot(company.getId());
+
+        // Then
+        verify(applicationRepository, times(1))
+                .findByJobPosting(any(JobPosting.class));
+        assertThat(result).isNotNull();
+        assertThat(result.get(0).getJobSeekerDto().getEmail())
+                .isEqualTo(JobApplicationDto.from(jobApplication).getJobSeekerDto().getEmail());
     }
 }

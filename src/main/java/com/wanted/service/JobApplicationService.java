@@ -1,6 +1,6 @@
 package com.wanted.service;
 
-import com.wanted.dto.application.ApplicationDto;
+import com.wanted.dto.application.JobApplicationDto;
 import com.wanted.dto.jobseeker.JobSeekerDto;
 import com.wanted.dto.jobposting.JobPostingDto;
 import com.wanted.exception.CustomException;
@@ -14,6 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static com.wanted.enums.MemberRole.JOB_SEEKER;
 import static com.wanted.exception.ErrorCode.*;
 
@@ -25,7 +29,7 @@ public class JobApplicationService {
     private final JobApplicationRepository jobApplicationRepository;
 
     @Transactional
-    public ApplicationDto addApplication(Long memberId, Long jobPostingId) {
+    public JobApplicationDto addApplication(Long memberId, Long jobPostingId) {
         Member member = getJobSeekerById(memberId);
         JobPosting jobPosting = getJobPostingById(jobPostingId);
 
@@ -36,7 +40,7 @@ public class JobApplicationService {
         JobSeekerDto jobSeekerDto = JobSeekerDto.from(member);
         JobPostingDto jobPostingDto = JobPostingDto.from(jobPosting);
 
-        return ApplicationDto.from(jobSeekerDto, jobPostingDto);
+        return JobApplicationDto.from(jobSeekerDto, jobPostingDto);
     }
 
     @Transactional
@@ -83,4 +87,28 @@ public class JobApplicationService {
         }
     }
 
+    public List<JobApplicationDto> getApplications(Long memberId) {
+        Member member = getJobSeekerById(memberId);
+
+        List<JobApplication> jobApplications =
+                jobApplicationRepository.findAllByApplicant(member);
+
+        return jobApplications.stream()
+                .map(JobApplicationDto::from)
+                .collect(Collectors.toList());
+    }
+
+    public List<JobApplicationDto> getApplicationsIGot(Long companyId) {
+        Member company = memberRepository.findById(companyId)
+                .orElseThrow(() -> new CustomException(COMPANY_NOT_FOUND));
+
+        List<JobPosting> jobPostings = jobPostingRepository.findByMember(company);
+
+        return jobPostings.stream()
+                .map(jobApplicationRepository::findByJobPosting)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(JobApplicationDto::from)
+                .collect(Collectors.toList());
+    }
 }
