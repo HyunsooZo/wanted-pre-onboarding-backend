@@ -57,7 +57,7 @@ class JobApplicationServiceTest {
             .password("1234")
             .name("테스트")
             .phone("010-1234-1234")
-            .imageUrl("https://test.com")
+            .resumeImageUrl("https://test.com")
             .role(JOB_SEEKER)
             .build();
 
@@ -193,8 +193,8 @@ class JobApplicationServiceTest {
         when(jobPostingRepository.findByMember(company))
                 .thenReturn(Collections.singletonList(jobPosting));
 
-        when(applicationRepository.findByJobPosting(jobPosting))
-                .thenReturn(Optional.of(jobApplication));
+        when(applicationRepository.findAllByJobPosting(jobPosting))
+                .thenReturn(Collections.singletonList(jobApplication));
 
         // When
         List<JobApplicationDto> result =
@@ -202,7 +202,7 @@ class JobApplicationServiceTest {
 
         // Then
         verify(applicationRepository, times(1))
-                .findByJobPosting(any(JobPosting.class));
+                .findAllByJobPosting(any(JobPosting.class));
         assertThat(result).isNotNull();
         assertThat(result.get(0).getJobSeekerDto().getEmail())
                 .isEqualTo(JobApplicationDto.from(jobApplication).getJobSeekerDto().getEmail());
