@@ -1,6 +1,6 @@
 package com.wanted.controller;
 
-import com.wanted.dto.ImageUrlResponse;
+import com.wanted.dto.image.ImageUrlResponse;
 import com.wanted.enums.ImageDirectory;
 import com.wanted.service.ImageService;
 import io.swagger.annotations.Api;

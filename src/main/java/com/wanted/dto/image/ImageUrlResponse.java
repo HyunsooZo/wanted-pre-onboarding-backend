@@ -1,4 +1,4 @@
-package com.wanted.dto;
+package com.wanted.dto.image;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
