@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.wanted.enums.MemberRole.JOB_SEEKER;
@@ -93,6 +94,20 @@ public class JobApplicationService {
                 jobApplicationRepository.findAllByApplicant(member);
 
         return jobApplications.stream()
+                .map(JobApplicationDto::from)
+                .collect(Collectors.toList());
+    }
+
+    public List<JobApplicationDto> getApplicationsIGot(Long companyId) {
+        Member company = memberRepository.findById(companyId)
+                .orElseThrow(() -> new CustomException(COMPANY_NOT_FOUND));
+
+        List<JobPosting> jobPostings = jobPostingRepository.findByMember(company);
+
+        return jobPostings.stream()
+                .map(jobApplicationRepository::findByJobPosting)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .map(JobApplicationDto::from)
                 .collect(Collectors.toList());
     }
