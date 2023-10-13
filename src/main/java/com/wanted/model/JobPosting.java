@@ -23,11 +23,13 @@ public class JobPosting extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "company", referencedColumnName = "id")
-    private Company company;
+    @JoinColumn(name = "member", referencedColumnName = "id")
+    private Member member;
 
     private String title;
     private String imageUrl;
+    private String country;
+    private String region;
     private String position;
     private Long reward;
     private String content;
@@ -42,7 +44,7 @@ public class JobPosting extends BaseEntity {
 
     public static JobPosting from(
             JobPostingRegistrationRequest jobPostingRequestDto,
-            Company company) {
+            Member member) {
         return JobPosting.builder()
                 .title(jobPostingRequestDto.getTitle())
                 .imageUrl(jobPostingRequestDto.getImageUrl())
@@ -50,7 +52,7 @@ public class JobPosting extends BaseEntity {
                 .reward(jobPostingRequestDto.getReward())
                 .content(jobPostingRequestDto.getContent())
                 .techStacks(jobPostingRequestDto.getTechStacks())
-                .company(company)
+                .member(member)
                 .build();
     }
 
@@ -73,5 +75,13 @@ public class JobPosting extends BaseEntity {
     public void setTechStacks(List<String> techStacks) {
         this.techStacks = techStacks;
     }
-
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public void setCountry(String country) {
+        this.country = country;
+    }
+    public void setRegion(String region) {
+        this.region = region;
+    }
 }
