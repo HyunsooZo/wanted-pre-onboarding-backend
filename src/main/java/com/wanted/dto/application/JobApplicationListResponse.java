@@ -1,5 +1,7 @@
 package com.wanted.dto.application;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,8 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ApiModel(value = "채용지원 목록 Response DTO")
 public class JobApplicationListResponse {
     List<JobApplicationDto> applications;
+
     public static JobApplicationListResponse from(List<JobApplicationDto> applications) {
         return JobApplicationListResponse.builder()
                 .applications(applications)

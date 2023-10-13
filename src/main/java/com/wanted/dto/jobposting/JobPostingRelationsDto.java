@@ -2,12 +2,13 @@ package com.wanted.dto.jobposting;
 
 import com.wanted.model.JobPosting;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-@Api("연관 채용공고 Dto")
+@ApiModel(value = "연관 채용공고 DTO")
 public class JobPostingRelationsDto {
     private Long id;
     private String title;

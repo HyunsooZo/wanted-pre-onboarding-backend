@@ -2,6 +2,7 @@ package com.wanted.dto.jobposting;
 
 import com.wanted.dto.company.CompanyDto;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Api("채용공고 상세정보 Response")
+@ApiModel(value = "채용공고 상세정보 Response DTO")
 public class JobPostingDetailResponse {
     private Long id;
     private String title;

@@ -1,6 +1,7 @@
 package com.wanted.dto.jobposting;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Api("채용공고 전체목록 Response")
+@ApiModel(value = "채용공고 전체목록 Response DTO")
 public class JobPostingListResponse {
     private List<JobPostingDto> jobPostings;
 

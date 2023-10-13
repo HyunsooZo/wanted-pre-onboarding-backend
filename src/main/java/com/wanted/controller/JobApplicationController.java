@@ -14,7 +14,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/applications")
-@Api(tags = "(채용공고에)지원 API", description = "채용공고에 지원합니다.")
+@Api(tags = "채용공고 지원 API", description = "채용공고에 지원합니다.")
 @RestController
 public class JobApplicationController {
     private final JobApplicationService jobApplicationService;
@@ -44,7 +44,7 @@ public class JobApplicationController {
                         jobApplicationDto.getJobSeekerDto().getEmail(),
                         jobApplicationDto.getJobSeekerDto().getName(),
                         jobApplicationDto.getJobSeekerDto().getPhone(),
-                        jobApplicationDto.getJobSeekerDto().getImageUrl()
+                        jobApplicationDto.getJobSeekerDto().getResumeImageUrl()
                 ));
 
         return ResponseEntity.status(CREATED).build();
