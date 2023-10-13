@@ -1,14 +1,15 @@
 package com.wanted.service;
 
-import com.wanted.dto.JobPostingModificationRequest;
+import com.wanted.dto.jobposting.JobPostingModificationRequest;
 import com.wanted.dto.jobposting.JobPostingDetailDto;
 import com.wanted.dto.jobposting.JobPostingDto;
 import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
+import com.wanted.enums.MemberRole;
 import com.wanted.exception.CustomException;
 import com.wanted.exception.ErrorCode;
-import com.wanted.model.Company;
+import com.wanted.model.Member;
 import com.wanted.model.JobPosting;
-import com.wanted.repository.CompanyRepository;
+import com.wanted.repository.MemberRepository;
 import com.wanted.repository.JobPostingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class JobPostingServiceTest {
 
     @Mock
-    private CompanyRepository companyRepository;
+    private MemberRepository memberRepository;
 
     @Mock
     private JobPostingRepository jobPostingRepository;
@@ -42,23 +43,23 @@ public class JobPostingServiceTest {
     public void setUp() {
 
         MockitoAnnotations.initMocks(this);
-        jobPostingService = new JobPostingService(jobPostingRepository, companyRepository);
+        jobPostingService = new JobPostingService(jobPostingRepository, memberRepository);
     }
 
-    static Company company = Company.builder()
+    static Member company = Member.builder()
             .id(1L)
             .email("test@naver.com")
             .phone("010-1234-1234")
-            .address("서울시 강남구")
             .name("테스트")
             .password("1234")
             .businessNumber("123-45-67890")
+            .role(MemberRole.COMPANY)
             .build();
 
     static JobPosting targetJobPosting = JobPosting.builder()
             .id(1L)
             .title("테스트 공고")
-            .company(company)
+            .member(company)
             .content("테스트입니다")
             .imageUrl("테스트입니다")
             .position("대리")
@@ -80,8 +81,7 @@ public class JobPostingServiceTest {
                         .techStacks(Arrays.asList("Java", "Spring"))
                         .build();
 
-        Company company = new Company();
-        when(companyRepository.findByEmail("test@naver.com"))
+        when(memberRepository.findByEmail("test@naver.com"))
                 .thenReturn(Optional.of(company));
 
         // When
@@ -106,7 +106,7 @@ public class JobPostingServiceTest {
                         .techStacks(Arrays.asList("Java", "Spring"))
                         .build();
 
-        when(companyRepository.findByEmail("test@naver.com"))
+        when(memberRepository.findByEmail("test@naver.com"))
                 .thenReturn(Optional.empty());
 
         // When & Then
@@ -122,7 +122,7 @@ public class JobPostingServiceTest {
         JobPosting jobPosting1 = JobPosting.builder()
                 .id(1L)
                 .techStacks(Arrays.asList("Java", "Spring"))
-                .company(company)
+                .member(company)
                 .content("테스트입니다")
                 .imageUrl("테스트입니다")
                 .position("대리")
@@ -131,7 +131,7 @@ public class JobPostingServiceTest {
 
         JobPosting jobPosting2 = JobPosting.builder()
                 .id(2L)
-                .company(company)
+                .member(company)
                 .content("테스트입니다")
                 .imageUrl("테스트입니다")
                 .position("대리")
@@ -141,10 +141,13 @@ public class JobPostingServiceTest {
 
         List<JobPosting> jobPostingList = Arrays.asList(jobPosting1, jobPosting2);
 
-        when(jobPostingRepository.findAll()).thenReturn(jobPostingList);
+        when(jobPostingRepository.customSearch(null,null,null,null))
+                .thenReturn(jobPostingList);
 
         // When
-        List<JobPostingDto> result = jobPostingService.getJobPostings();
+        List<JobPostingDto> result = jobPostingService.getJobPostings(
+                null, null, null, null
+        );
 
         // Then
         assertThat(result.size()).isEqualTo(2);
@@ -170,8 +173,8 @@ public class JobPostingServiceTest {
         jobPostings.add(relatedJobPosting2);
 
         when(jobPostingRepository.findById(companyId)).thenReturn(Optional.of(targetJobPosting));
-        when(jobPostingRepository.findByCompany(targetJobPosting.getCompany())).thenReturn(jobPostings);
-        when(companyRepository.findById(companyId)).thenReturn(Optional.of(company));
+        when(jobPostingRepository.findByMember(targetJobPosting.getMember())).thenReturn(jobPostings);
+        when(memberRepository.findById(companyId)).thenReturn(Optional.of(company));
 
         // When
         JobPostingDetailDto result = jobPostingService.getJobPostingDetails(companyId);
@@ -179,7 +182,7 @@ public class JobPostingServiceTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getJobPostingDto().getCompanyName())
-                .isEqualTo(targetJobPosting.getCompany().getName());
+                .isEqualTo(targetJobPosting.getMember().getName());
         assertThat(result.getRelations().size()).isEqualTo(2);
         assertThat(result.getRelations().get(0).getTitle()).isEqualTo("테스트2");
     }
@@ -225,9 +228,8 @@ public class JobPostingServiceTest {
                 .thenReturn(Optional.of(targetJobPosting));
 
         // When
-        jobPostingService.modifyJobPosting(
-                targetJobPosting.getId(), modificationRequestDto
-        );
+        jobPostingService.modifyJobPosting(targetJobPosting.getId(),
+                modificationRequestDto , targetJobPosting.getMember().getId());
 
         // Then
         assertThat(targetJobPosting.getContent()).isEqualTo("변경입니다");
@@ -247,7 +249,9 @@ public class JobPostingServiceTest {
 
         // When
         String deletedImageUrl =
-                jobPostingService.deleteJobPosting(targetJobPosting.getId());
+                jobPostingService.deleteJobPosting(
+                        targetJobPosting.getId(),targetJobPosting.getMember().getId()
+                );
 
         // Then
         verify(jobPostingRepository).delete(targetJobPosting);
