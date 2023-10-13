@@ -25,7 +25,8 @@ public enum ErrorCode {
 
     // 지원 관련 Exception
     ALREADY_APPLIED(HttpStatus.BAD_REQUEST, "이미 지원한 공고입니다."),
-    APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 지원내용입니다." );
+    APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 지원내용입니다."),
+    NOT_MY_APPLICATION(HttpStatus.FORBIDDEN,"해당 지원내용의 수정/삭제 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String message;
