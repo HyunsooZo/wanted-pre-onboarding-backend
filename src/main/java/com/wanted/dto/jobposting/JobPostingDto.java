@@ -16,6 +16,9 @@ public class JobPostingDto {
     private String title;
     private String companyName;
     private String position;
+    private String email;
+    private String country;
+    private String region;
     private Long reward;
     private List<String> techStacks;
 
@@ -24,8 +27,11 @@ public class JobPostingDto {
                 .id(jobPosting.getId())
                 .imageUrl(jobPosting.getImageUrl())
                 .title(jobPosting.getTitle())
-                .companyName(jobPosting.getCompany().getName())
+                .companyName(jobPosting.getMember().getName())
                 .position(jobPosting.getPosition())
+                .email(jobPosting.getMember().getEmail())
+                .country(jobPosting.getCountry())
+                .region(jobPosting.getRegion())
                 .reward(jobPosting.getReward())
                 .techStacks(jobPosting.getTechStacks())
                 .build();

@@ -1,6 +1,6 @@
 package com.wanted.dto.company;
 
-import com.wanted.model.Company;
+import com.wanted.model.Member;
 import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,18 +16,16 @@ public class CompanyDto {
     private Long id;
     private String email;
     private String name;
-    private String address;
     private String phone;
     private String imageUrl;
 
-    public static CompanyDto from(Company company) {
+    public static CompanyDto from(Member member) {
         return CompanyDto.builder()
-                .id(company.getId())
-                .email(company.getEmail())
-                .name(company.getName())
-                .address(company.getAddress())
-                .phone(company.getPhone())
-                .imageUrl(company.getImageUrl())
+                .id(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .phone(member.getPhone())
+                .imageUrl(member.getImageUrl())
                 .build();
     }
 }
