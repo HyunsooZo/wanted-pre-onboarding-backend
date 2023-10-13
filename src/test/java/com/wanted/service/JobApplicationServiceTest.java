@@ -1,6 +1,6 @@
 package com.wanted.service;
 
-import com.wanted.dto.application.ApplicationDto;
+import com.wanted.dto.application.JobApplicationDto;
 import com.wanted.enums.MemberRole;
 import com.wanted.exception.CustomException;
 import com.wanted.model.JobApplication;
@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.wanted.enums.MemberRole.JOB_SEEKER;
@@ -91,11 +92,11 @@ class JobApplicationServiceTest {
                 .thenReturn(Optional.empty());
 
         // When
-        ApplicationDto applicationDto = jobApplicationService.addApplication(
+        JobApplicationDto jobApplicationDto = jobApplicationService.addApplication(
                 member.getId(), jobPosting.getId());
 
         // Then
-        assertThat(applicationDto).isNotNull();
+        assertThat(jobApplicationDto).isNotNull();
     }
 
     @Test
@@ -144,5 +145,36 @@ class JobApplicationServiceTest {
         assertThatThrownBy(() -> jobApplicationService.addApplication(memberId, jobPostingId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("이미 지원한 공고입니다.");
+    }
+
+    @Test
+    public void testGetApplications() {
+        // Given
+
+        JobApplication application1 =
+                JobApplication.builder()
+                        .id(1L)
+                        .applicant(member)
+                        .jobPosting(jobPosting)
+                        .build();
+
+        JobApplication application2 =
+                JobApplication.builder()
+                        .id(2L)
+                        .applicant(member)
+                        .jobPosting(jobPosting)
+                        .build();
+
+        List<JobApplication> jobApplications = Arrays.asList(application1, application2);
+
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+        when(applicationRepository.findAllByApplicant(member)).thenReturn(jobApplications);
+
+        // When
+        List<JobApplicationDto> result =
+                jobApplicationService.getApplications(member.getId());
+
+        // Then
+        assertThat(result).isNotNull();
     }
 }
