@@ -2,6 +2,7 @@ package com.wanted.dto.jobposting;
 
 import com.wanted.model.JobPosting;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Builder
-@Api("채용공고 Dto")
+@ApiModel(value = "채용공고 DTO")
 public class JobPostingDto {
     private Long id;
     private String imageUrl;

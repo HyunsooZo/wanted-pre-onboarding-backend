@@ -30,7 +30,7 @@ public class Member extends BaseEntity {
     //해당 필드는 기업의 경우에만 사용 (추후 서비스 확장가능성을 위해 - openApi 를 통한 기업 인증 등..)
     private String businessNumber;
 
-    private String imageUrl;
+    private String resumeImageUrl;
 
     //회원의 타입을 나타내는 필드 (기업/구직자)
     @Enumerated(EnumType.STRING)

@@ -24,7 +24,7 @@ public class JobSeekerController {
     private final JobApplicationService jobApplicationService;
 
     @GetMapping("{memberId}")
-    @ApiOperation(value = "내가 지원한 공고 목록 조회", notes = "내가 지원한 모든 채용공고의 목록을 조회합니다.")
+    @ApiOperation(value = "내가 지원한 지원내역 목록 조회", notes = "내가 지원한 모든 지원내역의 목록을 조회합니다.")
     public ResponseEntity<JobApplicationListResponse> getJobPostingsIApplied(
             @PathVariable Long memberId) {
 
