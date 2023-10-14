@@ -75,7 +75,7 @@
       <td>채용공고 API</td>
       <td>채용공고 등록</td>
       <td><code>POST</code></td>
-      <td><code>/api/job-postings</code></td>
+      <td><code>/api/job-postings/member/{memberId}</code></td>
       <td>
       <pre><code>
 {
@@ -247,13 +247,14 @@
 </details>
 
 - [x] **프로젝트 구현 및 배포**
-    - 프로젝트는 Spring Boot 기반으로 구현했습니다.
-    - 프로젝트는 AWS EC2/Docker 를 사용하여 배포했습니다.
+    - 프로젝트는 `Spring Boot` 기반으로 구현했습니다.
+    - 프로젝트는 `AWS EC2`/`Docker` 를 사용하여 배포했습니다.
     - 젠킨스로 CI/CD를 구성했습니다.
-    - DB는 AWS RDS의 MySQL을 사용했습니다
-    - 이미지 업로드는 AWS S3를 사용했습니다.
-    - 프로젝트는 Swagger를 사용하여 API 명세서를 작성했습니다.
-    - AssertJ를 사용하여 테스트코드를 작성했습니다.
+    - DB는 `AWS RDS`의 `MySQL`을 사용했습니다
+    - 이미지 업로드는 `AWS S3`를 사용했습니다.
+    - 프로젝트는 `Swagger`를 사용하여 API 명세서를 작성했습니다.
+    - `AssertJ`를 사용하여 테스트코드를 작성했습니다.
+    - `JobSeeker`와 `Company`는 하나의 `Member` Entity에 `Role` 필드로 역할을 구분해 구현했습니다.
 
 - [x] **채용공고 등록 구현**
     - 채용공고 등록 시 이미지 경로를 받아 _(이미지 업로드 API 따로 구현했습니다.)_ 공고이미지를 등록할 수 있도록 했습니다.
