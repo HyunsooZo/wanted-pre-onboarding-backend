@@ -1,6 +1,5 @@
 package com.wanted.controller;
 
-import com.wanted.dto.jobposting.JobPostingModificationRequest;
 import com.wanted.dto.jobposting.*;
 import com.wanted.service.ImageService;
 import com.wanted.service.JobPostingService;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
@@ -25,12 +23,13 @@ public class JobPostingController {
     private final JobPostingService jobPostingService;
     private final ImageService imageService;
 
-    @PostMapping
+    @PostMapping("/member/{memberId}")
     @ApiOperation(value = "채용공고 등록", notes = "채용공고를 등록합니다.")
     public ResponseEntity<Void> addJobPosting(
+            @PathVariable Long memberId,
             @Valid @RequestBody JobPostingRegistrationRequest jobPostingRequestDto) {
 
-        jobPostingService.addJobPosting(jobPostingRequestDto);
+        jobPostingService.addJobPosting(memberId, jobPostingRequestDto);
 
         return ResponseEntity.status(CREATED).build();
     }
