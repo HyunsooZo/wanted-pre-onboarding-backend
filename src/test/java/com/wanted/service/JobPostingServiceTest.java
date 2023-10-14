@@ -1,16 +1,15 @@
 package com.wanted.service;
 
-import com.wanted.dto.jobposting.JobPostingModificationRequest;
 import com.wanted.dto.jobposting.JobPostingDetailDto;
 import com.wanted.dto.jobposting.JobPostingDto;
+import com.wanted.dto.jobposting.JobPostingModificationRequest;
 import com.wanted.dto.jobposting.JobPostingRegistrationRequest;
-import com.wanted.enums.MemberRole;
 import com.wanted.exception.CustomException;
 import com.wanted.exception.ErrorCode;
-import com.wanted.model.Member;
 import com.wanted.model.JobPosting;
-import com.wanted.repository.MemberRepository;
+import com.wanted.model.Member;
 import com.wanted.repository.JobPostingRepository;
+import com.wanted.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.wanted.enums.MemberRole.COMPANY;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
@@ -53,7 +53,7 @@ public class JobPostingServiceTest {
             .name("테스트")
             .password("1234")
             .businessNumber("123-45-67890")
-            .role(MemberRole.COMPANY)
+            .role(COMPANY)
             .build();
 
     static JobPosting targetJobPosting = JobPosting.builder()
@@ -81,11 +81,11 @@ public class JobPostingServiceTest {
                         .techStacks(Arrays.asList("Java", "Spring"))
                         .build();
 
-        when(memberRepository.findByEmail("test@naver.com"))
+        when(memberRepository.findByIdAndRole(company.getId(), COMPANY))
                 .thenReturn(Optional.of(company));
 
         // When
-        jobPostingService.addJobPosting(requestDto);
+        jobPostingService.addJobPosting(company.getId(), requestDto);
 
         // Then
         verify(jobPostingRepository, times(1))
@@ -106,11 +106,11 @@ public class JobPostingServiceTest {
                         .techStacks(Arrays.asList("Java", "Spring"))
                         .build();
 
-        when(memberRepository.findByEmail("test@naver.com"))
+        when(memberRepository.findByIdAndRole(company.getId(), COMPANY))
                 .thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> jobPostingService.addJobPosting(requestDto))
+        assertThatThrownBy(() -> jobPostingService.addJobPosting(company.getId(), requestDto))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("존재하지 않는 회사입니다.");
     }
@@ -141,7 +141,7 @@ public class JobPostingServiceTest {
 
         List<JobPosting> jobPostingList = Arrays.asList(jobPosting1, jobPosting2);
 
-        when(jobPostingRepository.customSearch(null,null,null,null))
+        when(jobPostingRepository.customSearch(null, null, null, null))
                 .thenReturn(jobPostingList);
 
         // When
@@ -205,7 +205,7 @@ public class JobPostingServiceTest {
         when(jobPostingRepository.findById(nonExistentCompanyId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(()-> jobPostingService.getJobPostingDetails(nonExistentCompanyId))
+        assertThatThrownBy(() -> jobPostingService.getJobPostingDetails(nonExistentCompanyId))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.JOB_POSTING_NOT_FOUND.getMessage());
     }
@@ -221,7 +221,7 @@ public class JobPostingServiceTest {
                         .reward(1000L)
                         .position("")
                         .title(null)
-                        .techStacks(Arrays.asList("변경1" , "변경2"))
+                        .techStacks(Arrays.asList("변경1", "변경2"))
                         .build();
 
         when(jobPostingRepository.findById(targetJobPosting.getId()))
@@ -229,7 +229,7 @@ public class JobPostingServiceTest {
 
         // When
         jobPostingService.modifyJobPosting(targetJobPosting.getId(),
-                modificationRequestDto , targetJobPosting.getMember().getId());
+                modificationRequestDto, targetJobPosting.getMember().getId());
 
         // Then
         assertThat(targetJobPosting.getContent()).isEqualTo("변경입니다");
@@ -250,7 +250,7 @@ public class JobPostingServiceTest {
         // When
         String deletedImageUrl =
                 jobPostingService.deleteJobPosting(
-                        targetJobPosting.getId(),targetJobPosting.getMember().getId()
+                        targetJobPosting.getId(), targetJobPosting.getMember().getId()
                 );
 
         // Then

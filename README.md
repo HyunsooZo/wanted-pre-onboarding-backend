@@ -75,7 +75,7 @@
       <td>채용공고 API</td>
       <td>채용공고 등록</td>
       <td><code>POST</code></td>
-      <td><code>/api/job-postings</code></td>
+      <td><code>/api/job-postings/member/{memberId}</code></td>
       <td>
       <pre><code>
 {

@@ -2,7 +2,6 @@ package com.wanted.service;
 
 import com.wanted.dto.company.CompanyDto;
 import com.wanted.dto.jobposting.*;
-import com.wanted.enums.MemberRole;
 import com.wanted.exception.CustomException;
 import com.wanted.model.JobPosting;
 import com.wanted.model.Member;
@@ -17,6 +16,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.wanted.enums.MemberRole.COMPANY;
 import static com.wanted.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
@@ -27,10 +27,11 @@ public class JobPostingService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void addJobPosting(JobPostingRegistrationRequest jobPostingRequestDto) {
+    public void addJobPosting(Long memberId,
+                              JobPostingRegistrationRequest jobPostingRequestDto) {
 
         Member member = memberRepository
-                .findByEmail(jobPostingRequestDto.getCompanyEmail())
+                .findByIdAndRole(memberId, COMPANY)
                 .orElseThrow(() -> new CustomException(COMPANY_NOT_FOUND));
 
         // 사전과제 요구사항에서 인증이 생략되었기 때문에 서비스레이어에서 직접 검증
@@ -110,7 +111,7 @@ public class JobPostingService {
     }
 
     private void validateMemberIsCompany(Member member) {
-        if (member.getRole() != MemberRole.COMPANY) {
+        if (member.getRole() != COMPANY) {
             throw new CustomException(NOT_COMPANY_MEMBER);
         }
     }
