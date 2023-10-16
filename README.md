@@ -5,6 +5,7 @@
 ## 📎 프로젝트 요구사항 분석 및 구현 (+ API 명세)
 
 [Swagger API 명세서](http://3.38.74.180:8080/swagger-ui/index.html#)
+swagger api 테스트 시 <br>(MemberId 1,2,3 - 기업 / 4,5 - 구직자 입니다.)
 <details>
 <summary>API 명세 테이블(클릭하세요)</summary>
 <table>
